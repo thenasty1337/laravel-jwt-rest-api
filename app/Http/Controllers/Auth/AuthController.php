@@ -10,22 +10,37 @@ use App\Http\Resources\Users\UserResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
     public function register(RegisterRequest $request, CreateUser $createUser): JsonResponse
     {
-        $createUser(
+        // Use the CreateUser action to create the user
+        $user = $createUser(
             name: $request->input('name'),
             email: $request->input('email'),
-            password: $request->input('password'),
+            password: $request->input('password'), // Ensure the password is hashed
         );
 
+       $credentials = $request->only(['email', 'password']);
+
+        $token = Auth::attempt($credentials);
+
+        if (! $token) {
+            return response()->json([
+                'status' => 'invalid-credentials',
+            ], 401);
+        }
+
+
+        // Return the token in the response
         return response()->json([
             'status' => 'user-created',
+            'access_token' => $token,
+            'token_type' => 'Bearer',
         ]);
     }
-
     public function login(LoginRequest $request): JsonResponse
     {
         $credentials = $request->only(['email', 'password']);

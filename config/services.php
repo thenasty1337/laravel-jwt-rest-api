@@ -31,4 +31,11 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'coinlayer' => [
+        'api_key' => env('COINLAYER_API_KEY'),
+    ],
+    'crypto_apis' => [
+        'api_key' => env('CRYPTO_APIS_KEY'),
+    ],
+
 ];

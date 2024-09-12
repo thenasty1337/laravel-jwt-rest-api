@@ -11,6 +11,11 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
+        $this->call([
+            CryptocurrencyBlockchainsSeeder::class,
+            CryptocurrenciesSeeder::class,
+        ]);
+
         User::factory()->create([
             'name'  => 'Developer',
             'email' => self::DEVELOPER_EMAIL,
