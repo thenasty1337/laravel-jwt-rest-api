@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\ServiceProvider;
-use App\Services\CoinLayerService;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -19,9 +18,6 @@ class AppServiceProvider extends ServiceProvider
             $this->app->register(TelescopeServiceProvider::class);
         }
 
-        $this->app->singleton(CoinLayerService::class, function ($app) {
-            return new CoinLayerService();
-        });
     }
 
     /**

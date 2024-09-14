@@ -2,13 +2,12 @@
     "name": "laravel/laravel",
     "type": "project",
     "description": "The Laravel Framework.",
-    "keywords": [
-        "framework",
-        "laravel"
-    ],
+    "keywords": ["framework", "laravel"],
     "license": "MIT",
     "require": {
         "php": "^8.3",
+        "filament/filament": "^3.2",
+        "filament/forms": "^3.2",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^11.00",
         "laravel/reverb": "@beta",
@@ -19,6 +18,7 @@
         "tymon/jwt-auth": "^2.0"
     },
     "require-dev": {
+        "barryvdh/laravel-ide-helper": "^3.1",
         "fakerphp/faker": "^1.9.1",
         "larastan/larastan": "^2.0",
         "laravel/pint": "^1.13",
@@ -45,7 +45,8 @@
     "scripts": {
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi"
+            "@php artisan package:discover --ansi",
+            "@php artisan filament:upgrade"
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"

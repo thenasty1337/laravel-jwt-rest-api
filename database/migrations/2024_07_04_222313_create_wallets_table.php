@@ -5,8 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -17,8 +16,6 @@ return new class extends Migration
             $table->uuid('uuid')->unique();
             $table->uuid('user_id');
             $table->foreign('user_id')->references('uuid')->on('users')->onDelete('cascade');
-            $table->uuid('currency_id');
-            $table->foreign('currency_id')->references('uuid')->on('cryptocurrencies')->onDelete('cascade');
             $table->string('currency'); // e.g., BTC, ETH, USD, EUR
             $table->string('deposit_address')->unique()->nullable();
             $table->decimal('balance', 20, 8)->default(0);

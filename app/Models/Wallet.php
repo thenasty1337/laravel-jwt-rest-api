@@ -11,7 +11,13 @@ class Wallet extends Model
     use HasFactory;
 
     protected $fillable = [
-        'uuid', 'user_id', 'currency_id', 'currency', 'deposit_address', 'balance', 'is_default',
+        'uuid',
+        'user_id',
+        'currency_id',
+        'currency',
+        'deposit_address',
+        'balance',
+        'is_default',
     ];
 
     protected static function boot()

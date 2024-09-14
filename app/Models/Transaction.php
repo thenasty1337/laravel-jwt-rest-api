@@ -11,7 +11,18 @@ class Transaction extends Model
     use HasFactory;
 
     protected $fillable = [
-        'uuid', 'user_id', 'wallet_id', 'currency_id', 'amount', 'transaction_type', 'status', 'exchange_rate', 'deposit_address', 'deposited_from', 'game_id', 'transfer_to',
+        'uuid',
+        'user_id',
+        'wallet_id',
+        'currency_id',
+        'amount',
+        'transaction_type',
+        'status',
+        'exchange_rate',
+        'deposit_address',
+        'deposited_from',
+        'game_id',
+        'transfer_to',
     ];
 
     protected static function boot()
@@ -33,13 +44,13 @@ class Transaction extends Model
         return $this->belongsTo(Wallet::class, 'wallet_id', 'uuid');
     }
 
-    public function currency()
-    {
-        return $this->belongsTo(Cryptocurrency::class, 'currency_id', 'uuid');
-    }
-
     public function game()
     {
-        return $this->belongsTo(Game::class, 'game_id', 'uuid');
+        return $this->belongsTo(Gamelist::class, 'game_id');
+    }
+
+    public function transferTo()
+    {
+        return $this->belongsTo(User::class, 'transfer_to', 'uuid');
     }
 }

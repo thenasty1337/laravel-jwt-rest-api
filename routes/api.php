@@ -16,12 +16,6 @@ Route::get('/details/{provider}/{gameSlug}', [GameController::class, 'getGameDet
 Route::get('/spinshield', [CallbackController::class, 'router'])->name('spinshield.router');
 
 
-Route::get('/messages', [MessageController::class, 'index']); // Public route
-
-Route::middleware('auth:api')->group(function () {
-    Route::post('/messages', [MessageController::class, 'store']); // Protected route
-    Route::delete('/messages/{id}', [MessageController::class, 'destroy']); // Protected route
-});
 
 Route::get('/test', function () {
     return response()->json(['message' => 'Hello World!']);

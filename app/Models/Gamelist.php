@@ -54,9 +54,13 @@ class Gamelist extends Model
         'index_rating' => 'integer',
         'active' => 'boolean',
         'new' => 'boolean',
-        'active' => 'boolean',
         'updated_at' => 'datetime',
         'created_at' => 'datetime',
     ];
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class, 'game_id');
+    }
 
 }
