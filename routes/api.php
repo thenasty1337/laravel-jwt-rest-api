@@ -6,6 +6,14 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Broadcast;
 
 use App\Http\Controllers\Transactions\WebhookController;
+use App\Http\Controllers\GameController;
+use App\Http\Controllers\Spinshield\CallbackController;
+use App\Http\Controllers\Spinshield\SpinshieldController;
+
+
+Route::get('/games', [GameController::class, 'getGames']);
+Route::get('/details/{provider}/{gameSlug}', [GameController::class, 'getGameDetails']);
+Route::get('/spinshield', [CallbackController::class, 'router'])->name('spinshield.router');
 
 
 Route::get('/messages', [MessageController::class, 'index']); // Public route
@@ -19,7 +27,7 @@ Route::get('/test', function () {
     return response()->json(['message' => 'Hello World!']);
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 Route::middleware('auth:api')->group(function () {
     Route::get('/user', [UserController::class, 'show'])

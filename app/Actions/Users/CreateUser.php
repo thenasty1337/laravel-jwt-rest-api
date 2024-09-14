@@ -12,11 +12,15 @@ class CreateUser
         string $name,
         string $email,
         string $password,
+        string $username,
+        string $avatar,
     ): User {
         $user = User::create([
-            'name'     => $name,
-            'email'    => $email,
+            'name' => $name,
+            'username' => $username,
+            'email' => $email,
             'password' => Hash::make($password),
+            'avatar' => $avatar,
         ]);
 
         event(new Registered($user));
