@@ -6,11 +6,13 @@ use spinshield\spinclient;
 use App\Models\Gamelist;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Collection;
 
 class SpinshieldController
 {
     protected $client;
     protected $helpers;
+    protected $supportedCurrencies = ['USD', 'BRL', 'AUD', 'NZD', 'TRY', 'CAD', 'GBP', 'EUR'];
 
     /**
      * SpinshieldController constructor.
@@ -27,18 +29,32 @@ class SpinshieldController
     }
 
     /**
-     * Retrieve the list of available games.
+     * Retrieve the list of available games for all supported currencies.
      *
-     * getGameList: https://documentation.spin.ac/api-methods/gamelist
-     *
-     * @return array
+     * @return Collection
      */
-    public function gamelist()
+    public function gamelist(): Collection
     {
-        return $this->helpers->morphJsonToArray($this->client->getGameList('USD', 1));
+        $allGames = collect();
+
+        foreach ($this->supportedCurrencies as $currency) {
+            $response = $this->helpers->morphJsonToArray($this->client->getGameList($currency, 1));
+
+            if (isset($response['response']) && is_array($response['response'])) {
+                $games = collect($response['response'])->map(function ($game) use ($currency) {
+                    $game['currency'] = $currency;
+                    return $game;
+                });
+
+                $allGames = $allGames->concat($games);
+                Log::info('Fetched ' . $games->count() . ' games for currency: ' . $currency);
+            } else {
+                Log::error("Failed to fetch games for currency: $currency");
+            }
+        }
+
+        return $allGames->unique('id_hash');
     }
-
-
 
     public function deleteAllFreeRounds(User $user, $currency)
     {
@@ -71,30 +87,22 @@ class SpinshieldController
         return true;
     }
 
-
-
     /**
      * Start a game for the given user.
-     *
-     * createPlayer: https://documentation.spin.ac/api-methods/create-player
-     * getGame: https://documentation.spin.ac/api-methods/get-game
-     *
-     * Supported languages: fr en de tr ru nl pt es
-     * Supported currencies: USD BRL AUD NZD TRY CAD GBP EUR
      *
      * @param User $user
      * @param string $id_hash
      * @param int $demo
+     * @param string $currency
      * @return array
      */
-    public function startGame(User $user, string $id_hash, int $demo, $currency)
+    public function startGame(User $user, string $id_hash, int $demo, string $currency)
     {
-
         $currency = strtoupper($currency);
         $playerId = $user->id . '-' . $currency;
         $playerPassword = $playerId;
-        // Create player on the spinshield API - should always be called before opening game
 
+        // Create player on the spinshield API
         $this->client->createPlayer(
             $playerId,
             $playerPassword,
@@ -103,16 +111,15 @@ class SpinshieldController
         );
 
         // Open the specified game
-        if ($demo === 1) {
-            $gameResponse = $this->client->getGameDemo(
+        $gameResponse = $demo === 1
+            ? $this->client->getGameDemo(
                 $id_hash,
                 $currency,
                 config('spinshield.home_url'),
                 config('spinshield.deposit_url'),
                 config('spinshield.game_language'),
-            );
-        } else {
-            $gameResponse = $this->client->getGame(
+            )
+            : $this->client->getGame(
                 $playerId,
                 $playerPassword,
                 $id_hash,
@@ -122,11 +129,10 @@ class SpinshieldController
                 $demo,
                 config('spinshield.game_language')
             );
-        }
-
 
         if ($this->helpers->responseHasError($gameResponse)) {
-            // insert additional error handling/logic
+            Log::error('Error starting game: ' . json_encode($gameResponse));
+            throw new \Exception('Failed to start game');
         }
 
         return $this->helpers->morphJsonToArray($gameResponse);

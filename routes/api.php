@@ -1,14 +1,11 @@
 <?php
 
 use App\Http\Controllers\Users\UserController;
-use App\Http\Controllers\Chat\MessageController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Broadcast;
 
-use App\Http\Controllers\Transactions\WebhookController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\Spinshield\CallbackController;
-use App\Http\Controllers\Spinshield\SpinshieldController;
+use App\Http\Controllers\Chat\ChatController;
 
 
 Route::get('/games', [GameController::class, 'getGames']);
@@ -20,6 +17,9 @@ Route::get('/spinshield', [CallbackController::class, 'router'])->name('spinshie
 Route::get('/test', function () {
     return response()->json(['message' => 'Hello World!']);
 });
+
+Route::get('/chat', [ChatController::class, 'index']);
+
 
 require __DIR__ . '/auth.php';
 
@@ -34,7 +34,12 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
 
     Route::patch('/user/change-password', [UserController::class, 'changePassword'])
         ->name('user.change-password');
+
+    Route::post('/chat', [ChatController::class, 'store']);
+    Route::post('/chat/get-messages', [ChatController::class, 'getMessages']);
+    Route::post('/chat/remove-message', [ChatController::class, 'removeMessage']);
+    Route::post('/chat/clear', [ChatController::class, 'clearChat']);
+    Route::post('/chat/lock', [ChatController::class, 'lockChat']);
 });
 
 
-Route::post('/webhook/transaction', [WebhookController::class, 'handleTransaction']);
